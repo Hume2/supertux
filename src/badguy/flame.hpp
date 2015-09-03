@@ -36,6 +36,11 @@ public:
 
   void freeze();
   bool is_freezable() const;
+  virtual std::string get_class() const {
+    return "flame";
+  }
+
+  virtual ObjectSettings get_settings();
 
 private:
   float angle;

@@ -31,6 +31,11 @@ public:
 
   void freeze();
   bool is_freezable() const;
+  virtual std::string get_class() const {
+    return "sspiky";
+  }
+
+  virtual ObjectSettings get_settings();
 
 protected:
   enum SSpikyState {

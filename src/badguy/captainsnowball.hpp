@@ -29,6 +29,11 @@ public:
   void collision_solid(const CollisionHit& hit);
 
   bool might_climb(int width, int height);
+  virtual std::string get_class() const {
+    return "captainsnowball";
+  }
+
+  virtual ObjectSettings get_settings();
 
 protected:
   bool collision_squished(GameObject& object);

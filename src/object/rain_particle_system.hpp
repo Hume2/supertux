@@ -34,6 +34,11 @@ public:
 
   std::string type() const
   { return "RainParticleSystem"; }
+  virtual std::string get_class() const {
+    return "particles-rain";
+  }
+
+  virtual ObjectSettings get_settings();
 
 private:
   class RainParticle : public Particle

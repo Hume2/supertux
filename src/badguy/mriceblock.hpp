@@ -40,6 +40,11 @@ public:
   bool is_portable() const;
 
   bool can_break();
+  virtual std::string get_class() const {
+    return "mriceblock";
+  }
+
+  virtual ObjectSettings get_settings();
 
 protected:
   enum IceState {
@@ -64,6 +69,7 @@ class SmartBlock : public MrIceBlock
 {
 public:
   SmartBlock(const Reader& reader);
+  virtual ObjectSettings get_settings();
 };
 
 #endif

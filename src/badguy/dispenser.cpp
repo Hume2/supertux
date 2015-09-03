@@ -17,12 +17,14 @@
 #include "badguy/dispenser.hpp"
 
 #include "audio/sound_manager.hpp"
+#include "editor/editor.hpp"
 #include "math/random_generator.hpp"
 #include "object/bullet.hpp"
 #include "object/player.hpp"
 #include "supertux/object_factory.hpp"
 #include "supertux/sector.hpp"
 #include "util/reader.hpp"
+#include "util/gettext.hpp"
 
 #include <stdexcept>
 
@@ -70,6 +72,15 @@ Dispenser::Dispenser(const Reader& reader) :
 
   bbox.set_size(sprite->get_current_hitbox_width(), sprite->get_current_hitbox_height());
   countMe = false;
+}
+
+void
+Dispenser::save(lisp::Writer& writer) {
+  BadGuy::save(writer);
+  writer.write("type", type, false);
+  writer.write("badguy", badguys);
+  writer.write("random", random);
+  writer.write("cycle", cycle);
 }
 
 void
@@ -173,7 +184,7 @@ void
 Dispenser::launch_badguy()
 {
   //FIXME: Does is_offscreen() work right here?
-  if (!is_offscreen()) {
+  if (!is_offscreen() && !Editor::current()) {
     Direction launchdir = dir;
     if( !autotarget && start_dir == AUTO ){
       Player* player = this->get_nearest_player();
@@ -301,6 +312,18 @@ bool
 Dispenser::is_freezable() const
 {
   return true;
+}
+
+
+ObjectSettings
+Dispenser::get_settings() {
+  ObjectSettings result(_("Dispenser"));
+  result.options.push_back( ObjectOption(MN_TEXTFIELD, _("Name"), &name));
+  result.options.push_back( dir_option(&dir) );
+  result.options.push_back( ObjectOption(MN_TEXTFIELD, _("Death script"), &dead_script));
+  result.options.push_back( ObjectOption(MN_NUMFIELD, _("Cycle"), &cycle));
+  result.options.push_back( ObjectOption(MN_TOGGLE, _("Random"), &random));
+  return result;
 }
 
 /* EOF */

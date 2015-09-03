@@ -32,6 +32,11 @@ public:
 
   std::string type() const
   { return "SnowParticleSystem"; }
+  virtual std::string get_class() const {
+    return "particle-snow";
+  }
+
+  virtual ObjectSettings get_settings();
 
 private:
   class SnowParticle : public Particle
