@@ -234,7 +234,7 @@ public:
   /**
    * Requests that the player stop climbing the given Climbable
    */
-  void stop_climbing(Climbable& climbable);
+  void stop_climbing();
 
   Physic& get_physic() { return physic; }
 
@@ -342,6 +342,10 @@ public:
 
   Climbable* climbing; /**< Climbable object we are currently climbing, null if none */
   bool climbing_tilemap;
+
+  bool is_climbing() {
+    return climbing || climbing_tilemap;
+  }
 
 private:
   Player(const Player&);

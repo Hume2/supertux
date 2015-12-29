@@ -194,7 +194,7 @@ Player::Player(PlayerStatus* _player_status, const std::string& name_) :
 
 Player::~Player()
 {
-  if (climbing) stop_climbing(*climbing);
+  if (is_climbing()) stop_climbing();
 }
 
 void
@@ -338,7 +338,7 @@ Player::adjust_height(float new_height)
 void
 Player::trigger_sequence(std::string sequence_name)
 {
-  if (climbing) stop_climbing(*climbing);
+  if (is_climbing()) stop_climbing();
   backflipping = false;
   backflip_direction = 0;
   sprite->set_angle(0.0f);
@@ -453,8 +453,10 @@ Player::update(float elapsed_time)
   ice_this_frame = false;
 
   if (climbing_tilemap && !can_climb && !climbing) {
-    stop_climbing(NULL);
+    stop_climbing();
   }
+
+  can_climb = false;
 
   // when invincible, spawn particles
   if (invincible_timer.started())
@@ -482,7 +484,7 @@ Player::update(float elapsed_time)
   }
 
   // when climbing animate only while moving
-  if(climbing){
+  if(is_climbing()){
     if((physic.get_velocity_x()==0)&&(physic.get_velocity_y()==0))
       sprite->stop_animation();
     else
@@ -824,7 +826,7 @@ Player::handle_input()
     handle_input_ghost();
     return;
   }
-  if (climbing) {
+  if (is_climbing()) {
     handle_input_climbing();
     return;
   }
@@ -1012,7 +1014,7 @@ Player::try_grab()
 
       // check if we are within reach
       if(moving_object->get_bbox().contains(pos)) {
-        if (climbing) stop_climbing(*climbing);
+        if (climbing && !climbing_tilemap) stop_climbing();
         grabbed_object = portable;
         position_grabbed_object();
         break;
@@ -1129,7 +1131,7 @@ Player::set_bonus(BonusType type, bool animate)
       growing = true;
       sprite->set_action((dir == LEFT)?"grow-left":"grow-right", 1);
     }
-    if (climbing) stop_climbing(*climbing);
+    if (is_climbing()) stop_climbing();
   }
 
   if (type == NO_BONUS) {
@@ -1171,7 +1173,7 @@ Player::set_bonus(BonusType type, bool animate)
     if(!particle_name.empty() && animate) {
       Sector::current()->add_object(std::make_shared<SpriteParticle>("images/objects/particles/" + particle_name + ".sprite", action, ppos, ANCHOR_TOP, pspeed, paccel, LAYER_OBJECTS - 1));
     }
-    if(climbing) stop_climbing(*climbing);
+    if(is_climbing()) stop_climbing();
 
     player_status->max_fire_bullets = 0;
     player_status->max_ice_bullets = 0;
@@ -1260,7 +1262,7 @@ Player::draw(DrawingContext& context)
   else if (stone) {
     sprite->set_action(sprite->get_action()+"-stone");
   }
-  else if (climbing) {
+  else if (is_climbing()) {
     sprite->set_action(sa_prefix+"-climbing"+sa_postfix);
   }
   else if (backflipping) {
@@ -1510,7 +1512,7 @@ Player::kill(bool completely)
 
   growing = false;
 
-  if (climbing) stop_climbing(*climbing);
+  if (is_climbing()) stop_climbing();
 
   physic.set_velocity_x(0);
 
@@ -1598,7 +1600,7 @@ Player::move(const Vector& vector)
   powersprite->set_angle(0.0f);
   lightsprite->set_angle(0.0f);
   last_ground_y = vector.y;
-  if (climbing) stop_climbing(*climbing);
+  if (is_climbing()) stop_climbing();
 
   physic.reset();
 }
@@ -1674,7 +1676,7 @@ Player::deactivate()
   physic.set_velocity_y(0);
   physic.set_acceleration_x(0);
   physic.set_acceleration_y(0);
-  if (climbing) stop_climbing(*climbing);
+  if (is_climbing()) stop_climbing();
 }
 
 void
@@ -1701,7 +1703,7 @@ Player::set_ghost_mode(bool enable)
   if (ghost_mode == enable)
     return;
 
-  if (climbing) stop_climbing(*climbing);
+  if (is_climbing()) stop_climbing();
 
   if (enable) {
     ghost_mode = true;
@@ -1728,6 +1730,10 @@ Player::start_climbing(Climbable& climbable)
   if (climbing) return;
 
   climbing = &climbable;
+  if (can_climb) {
+    climbing_tilemap = true;
+  }
+
   physic.enable_gravity(false);
   physic.set_velocity(0, 0);
   physic.set_acceleration(0, 0);
@@ -1741,11 +1747,12 @@ Player::start_climbing(Climbable& climbable)
 }
 
 void
-Player::stop_climbing(Climbable& /*climbable*/)
+Player::stop_climbing()
 {
   if (!climbing) return;
 
   climbing = 0;
+  climbing_tilemap = false;
 
   if (grabbed_object) {
     grabbed_object->ungrab(*this, dir);
@@ -1766,7 +1773,7 @@ Player::stop_climbing(Climbable& /*climbable*/)
 void
 Player::handle_input_climbing()
 {
-  if (!climbing) {
+  if (!is_climbing()) {
     log_warning << "handle_input_climbing called with climbing set to 0. Input handling skipped" << std::endl;
     return;
   }
@@ -1789,14 +1796,14 @@ Player::handle_input_climbing()
   }
   if (controller->hold(Controller::JUMP)) {
     if (can_jump) {
-      stop_climbing(*climbing);
+      stop_climbing();
       return;
     }
   } else {
     can_jump = true;
   }
   if (controller->hold(Controller::ACTION)) {
-    stop_climbing(*climbing);
+    stop_climbing();
     return;
   }
   physic.set_velocity(vx, vy);

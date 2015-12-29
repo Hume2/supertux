@@ -52,7 +52,7 @@ Climbable::Climbable(const Rectf& area) :
 Climbable::~Climbable()
 {
   if (climbed_by) {
-    climbed_by->stop_climbing(*this);
+    climbed_by->stop_climbing();
     climbed_by = 0;
   }
 }
@@ -63,7 +63,7 @@ Climbable::update(float /*elapsed_time*/)
   if (!climbed_by) return;
 
   if (!may_climb(*climbed_by)) {
-    climbed_by->stop_climbing(*this);
+    climbed_by->stop_climbing();
     climbed_by = 0;
   }
 }
@@ -100,7 +100,7 @@ Climbable::event(Player& player, EventType type)
     }
   }
   if(type == EVENT_LOSETOUCH) {
-    player.stop_climbing(*this);
+    player.stop_climbing();
     climbed_by = 0;
   }
 }
