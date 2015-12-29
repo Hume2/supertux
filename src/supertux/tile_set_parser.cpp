@@ -87,8 +87,8 @@ TileSetParser::parse_tile(const ReaderMapping& reader)
     attributes |= Tile::SOLID;
   if(reader.get("unisolid", value) && value)
     attributes |= Tile::UNISOLID | Tile::SOLID;
-  if(reader.get("brick", value) && value)
-    attributes |= Tile::BRICK;
+  if(reader.get("ladder", value) && value)
+    attributes |= Tile::LADDER;
   if(reader.get("ice", value) && value)
     attributes |= Tile::ICE;
   if(reader.get("water", value) && value)

@@ -39,11 +39,8 @@ public:
     /** uni-directional solid tile */
     UNISOLID  = 0x0002,
     /** a brick that can be destroyed by jumping under it */
-    BRICK     = 0x0004, //Marked for removal, DO NOT USE!
-    /** the level should be finished when touching a goaltile.
-     * if data is 0 then the endsequence should be triggered, if data is 1
-     * then we can finish the level instantly.
-     */
+    LADDER     = 0x0004,
+    /** makes the block climbamle by itself */
     GOAL      = 0x0008, //Marked for removal, DO NOT USE!
     /** slope tile */
     SLOPE     = 0x0010,

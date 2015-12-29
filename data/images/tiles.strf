@@ -3678,6 +3678,11 @@
       2048
       2049
     )
+    (attributes
+      4
+      4
+      4
+    )
     (image "tiles/forest/ladder.png")
   )
   (tiles
@@ -4305,6 +4310,10 @@
     (ids
       3060 3062 3064 3066
       3061 3063 3065 3067
+    )
+    (attributes
+      4 4 4 4
+      4 4 4 4
     )
     (image "tiles/background/rope.png")
   )

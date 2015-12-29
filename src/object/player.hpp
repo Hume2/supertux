@@ -289,6 +289,7 @@ private:
   bool jump_early_apex;
   bool on_ice;
   bool ice_this_frame;
+  bool can_climb;
   SpritePtr lightsprite;
   SpritePtr powersprite;
 
@@ -340,6 +341,7 @@ public:
   unsigned int idle_stage;
 
   Climbable* climbing; /**< Climbable object we are currently climbing, null if none */
+  bool climbing_tilemap;
 
 private:
   Player(const Player&);

@@ -133,6 +133,7 @@ Player::Player(PlayerStatus* _player_status, const std::string& name_) :
   jump_early_apex(),
   on_ice(),
   ice_this_frame(),
+  can_climb(false),
   lightsprite(SpriteManager::current()->create("images/creatures/tux/light.sprite")),
   powersprite(SpriteManager::current()->create("images/creatures/tux/powerups.sprite")),
   dir(),
@@ -166,7 +167,8 @@ Player::Player(PlayerStatus* _player_status, const std::string& name_) :
   unduck_hurt_timer(),
   idle_timer(),
   idle_stage(0),
-  climbing(0)
+  climbing(0),
+  climbing_tilemap(false)
 {
   this->name = name_;
   controller = InputManager::current()->get_controller();
@@ -449,6 +451,10 @@ Player::update(float elapsed_time)
 
   on_ground_flag = false;
   ice_this_frame = false;
+
+  if (climbing_tilemap && !can_climb && !climbing) {
+    stop_climbing(NULL);
+  }
 
   // when invincible, spawn particles
   if (invincible_timer.started())
@@ -1391,6 +1397,10 @@ Player::collision_tile(uint32_t tile_attributes)
   if(tile_attributes & Tile::ICE) {
     ice_this_frame = true;
     on_ice = true;
+  }
+
+  if(tile_attributes & Tile::LADDER) {
+    can_climb = true;
   }
 }
 
