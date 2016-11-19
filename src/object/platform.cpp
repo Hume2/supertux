@@ -19,6 +19,7 @@
 #include "editor/editor.hpp"
 #include "object/player.hpp"
 #include "scripting/squirrel_util.hpp"
+#include "supertux/constants.hpp"
 #include "supertux/object_factory.hpp"
 #include "supertux/sector.hpp"
 #include "util/reader_mapping.hpp"
@@ -36,11 +37,13 @@ Platform::Platform(const ReaderMapping& reader, const std::string& default_sprit
   speed(Vector(0,0)),
   automatic(false),
   player_contact(false),
-  last_player_contact(false)
+  last_player_contact(false),
+  unisolid(false)
 {
   bool running = true;
   reader.get("name", name);
   reader.get("running", running);
+  reader.get("unisolid", unisolid);
   if ((name.empty()) && (!running)) {
     automatic = true;
   }
@@ -64,6 +67,7 @@ void
 Platform::save(Writer& writer) {
   MovingSprite::save(writer);
   writer.write("running", walker->is_moving());
+  writer.write("unisolid", unisolid);
   path->save(writer);
 }
 
@@ -72,6 +76,7 @@ Platform::get_settings() {
   ObjectSettings result = MovingSprite::get_settings();
   result.options.push_back( Path::get_mode_option(&path->mode) );
   result.options.push_back( PathWalker::get_running_option(&walker->running) );
+  result.options.push_back( ObjectOption(MN_TOGGLE, _("Unisolid"), &unisolid));
   return result;
 }
 
@@ -90,6 +95,18 @@ Platform::get_settings() {
   walker->path = &*path;
   }
 */
+
+bool
+Platform::collides(GameObject& other, const CollisionHit& hit) const
+{
+  if (!unisolid) return true;
+
+  auto obj = dynamic_cast<MovingObject*>(&other);
+  if (!obj) return false;
+
+  float y_movement = obj->get_movement().y - get_movement().y;
+  return (y_movement >= -SHIFT_DELTA) && (obj->get_bbox().p2.y - SHIFT_DELTA < bbox.p1.y);
+}
 
 HitResponse
 Platform::collision(GameObject& other, const CollisionHit& )

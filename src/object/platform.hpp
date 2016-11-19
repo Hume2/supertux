@@ -35,6 +35,7 @@ public:
   virtual void save(Writer& writer);
   virtual ObjectSettings get_settings();
 
+  virtual bool collides(GameObject& other, const CollisionHit& hit) const;
   virtual HitResponse collision(GameObject& other, const CollisionHit& hit);
   virtual void update(float elapsed_time);
 
@@ -83,6 +84,7 @@ private:
   bool player_contact; /**< true if a Player touched the Platform during the last round of collision detections */
   bool last_player_contact; /**< true if a Player touched the Platform during the round before the last round of collision detections */
 
+  bool unisolid;
 };
 
 #endif
