@@ -56,6 +56,10 @@ public:
    */
   void add_coins(int count);
   /**
+   * Get how many coins does Tux have.
+   */
+  int get_coins();
+  /**
    * Make tux invincible for a short amount of time
    */
   void make_invincible();
