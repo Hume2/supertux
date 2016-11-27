@@ -51,7 +51,7 @@
 /** ticks (as returned from SDL_GetTicks) per frame */
 static const Uint32 TICKS_PER_FRAME = (Uint32) (1000.0 / LOGICAL_FPS);
 /** don't skip more than every 2nd frame */
-static const int MAX_FRAME_SKIP = 2;
+static const int MAX_FRAME_SKIP = 4;
 
 ScreenManager::ScreenManager() :
   m_waiting_threads(),
@@ -374,7 +374,7 @@ void
 ScreenManager::run(DrawingContext &context)
 {
   Uint32 last_ticks = 0;
-  Uint32 elapsed_ticks = 0;
+  int elapsed_ticks = 0;
 
   handle_screen_switch();
 
@@ -386,25 +386,25 @@ ScreenManager::run(DrawingContext &context)
 
     Uint32 ticks_per_frame = (Uint32) (TICKS_PER_FRAME * g_game_speed);
 
-    if (elapsed_ticks > ticks_per_frame*4)
+    if (elapsed_ticks > int(ticks_per_frame * MAX_FRAME_SKIP))
     {
       // when the game loads up or levels are switched the
       // elapsed_ticks grows extremely large, so we just ignore those
       // large time jumps
-      elapsed_ticks = 0;
+      elapsed_ticks = ticks_per_frame * MAX_FRAME_SKIP;
     }
 
-    if (elapsed_ticks < ticks_per_frame)
+    /*if (elapsed_ticks < ticks_per_frame)
     {
       Uint32 delay_ticks = ticks_per_frame - elapsed_ticks;
       SDL_Delay(delay_ticks);
       last_ticks += delay_ticks;
       elapsed_ticks += delay_ticks;
-    }
+    }*/
 
     int frames = 0;
 
-    while (elapsed_ticks >= ticks_per_frame && frames < MAX_FRAME_SKIP)
+    while (elapsed_ticks >= int(ticks_per_frame) && frames < MAX_FRAME_SKIP)
     {
       elapsed_ticks -= ticks_per_frame;
       float timestep = 1.0 / LOGICAL_FPS;
