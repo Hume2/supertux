@@ -187,6 +187,11 @@ WalkingBadguy::collision_badguy(BadGuy& , const CollisionHit& hit)
     turn_around();
   }
 
+  if (hit.bottom) {
+    update_on_ground_flag(hit);
+    if (physic.get_velocity_y() > 0) physic.set_velocity_y(0);
+  }
+
   return CONTINUE;
 }
 
