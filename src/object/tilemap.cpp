@@ -1009,12 +1009,6 @@ TileMap::update_effective_solid(bool update_manager)
 }
 
 void
-TileMap::set_tileset(const TileSet* new_tileset)
-{
-  m_tileset = new_tileset;
-}
-
-void
 TileMap::convert_tiles_to_objects()
 {
   // Since object setup is not yet complete, we have to manually add the offset.
@@ -1041,7 +1035,7 @@ TileMap::convert_tiles_to_objects()
             if (dynamic_cast<MovingObject*>(&obj))
               m_converted_objects.push_back(obj.get_uid());
 
-            change(x, y, 0);
+            m_tiles[y*m_width + x] = 0;
           }
           catch (const std::exception& err)
           {
@@ -1055,7 +1049,7 @@ TileMap::convert_tiles_to_objects()
         const uint32_t attributes = tile.get_attributes();
         if (attributes & Tile::FIRE)
         {
-          const Vector pos = get_tile_position(x, y) + offset;
+          const Vector pos = get_tile_position(x, y);
           const Vector center = pos + Vector(16.f, 16.f);
 
           if (attributes & Tile::HURTS)
